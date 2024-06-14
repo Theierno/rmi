@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 // Interface distante
 interface RemoteInterface extends Remote {
-    String sayHello() throws RemoteException;
 
     void addMessage(String pseudo, String text) throws RemoteException;
 
@@ -17,10 +16,6 @@ interface RemoteInterface extends Remote {
 // Implémentation de l'interface distante
 class RemoteImpl implements RemoteInterface {
     ArrayList<Message> messages = new ArrayList<>();
-
-    public String sayHello() throws RemoteException {
-        return "Hello, world!";
-    }
 
     public void addMessage(String pseud, String text) {
         Message message = new Message(pseud, text);

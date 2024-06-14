@@ -2,7 +2,19 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
+import RMI.ChatUser;
+
 public class Client {
+
+    public void subscribe(ChatUser user, String pseudo) throws Exception {
+
+        this.addMessage(pseudo, "est dans la réunion");
+    }
+
+    public void unsubscribe(String pseudo) throws Exception {
+        this.addMessage(pseudo, "a quitté la reunion");
+
+    }
 
     public void addMessage(String pseudo, String text) throws Exception {
         try {

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,6 +12,12 @@ public class ChatUserImpl {
     private String pseudo = null;
     private int lastIndex = 0;
 
+    private JLabel avatarLabel = new JLabel();
+    private ImageIcon selectedAvatar;
+    private JLabel usernameLabel = new JLabel();
+
+    private static final String ASSETS_PATH = "C:/assets/";
+
     private JFrame window = new JFrame(this.title);
     private JTextArea txtOutput = new JTextArea();
     private JTextField txtMessage = new JTextField();
@@ -21,8 +28,8 @@ public class ChatUserImpl {
     ArrayList<Message> messages = new ArrayList<Message>();
 
     public ChatUserImpl() {
-        this.createIHM();
         this.requestPseudo();
+        this.createIHM();
     }
 
     public void createIHM() {
@@ -58,6 +65,14 @@ public class ChatUserImpl {
         southPanel.add(this.txtMessage, BorderLayout.CENTER);
         southPanel.add(this.btnSend, BorderLayout.EAST);
         panel.add(southPanel, BorderLayout.SOUTH);
+
+        JPanel avatarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        avatarPanel.setBackground(new Color(200, 220, 240));
+        avatarPanel.add(avatarLabel);
+        avatarPanel.add(usernameLabel);
+        panel.add(avatarPanel, BorderLayout.NORTH);
+
+        // panel.add(avatarPanel, BorderLayout.NORTH);
 
         // Gestion des évènements
         window.addWindowListener(new WindowAdapter() {
@@ -99,8 +114,51 @@ public class ChatUserImpl {
         this.pseudo = JOptionPane.showInputDialog(
                 this.window, "Entrez votre pseudo : ",
                 this.title, JOptionPane.OK_OPTION);
+
+        selectedAvatar = chooseAvatar();
+        avatarLabel = new JLabel(
+                new ImageIcon(selectedAvatar.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH)));
+        usernameLabel = new JLabel(this.pseudo);
+
+        usernameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         if (this.pseudo == null)
             System.exit(0);
+    }
+
+    private ImageIcon chooseAvatar() {
+        String[] avatars = { "male.png", "male1.png", "female.png", "female1.png" };
+        JDialog avatarDialog = new JDialog(this.window, "Choisissez votre avatar", true);
+        avatarDialog.setLayout(new FlowLayout());
+
+        JButton[] avatarButtons = new JButton[avatars.length];
+        ImageIcon[] avatarIcons = new ImageIcon[avatars.length];
+
+        for (int i = 0; i < avatars.length; i++) {
+            avatarIcons[i] = loadAvatarIcon(avatars[i], avatars[i].replace(".png", ""));
+            avatarButtons[i] = new JButton(
+                    new ImageIcon(avatarIcons[i].getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH)));
+            final int index = i;
+            avatarButtons[i].addActionListener(e -> {
+                avatarDialog.dispose();
+                selectedAvatar = avatarIcons[index];
+            });
+            avatarDialog.add(avatarButtons[i]);
+        }
+
+        avatarDialog.pack();
+        avatarDialog.setVisible(true);
+
+        return selectedAvatar;
+    }
+
+    private ImageIcon loadAvatarIcon(String filename, String description) {
+        File file = new File(ASSETS_PATH + filename);
+        if (!file.exists()) {
+            throw new RuntimeException("Ressource non trouvée : " + file.getAbsolutePath());
+        }
+        ImageIcon icon = new ImageIcon(file.getAbsolutePath());
+        icon.setDescription(description);
+        return icon;
     }
 
     public void window_windowClosing(WindowEvent e) {
